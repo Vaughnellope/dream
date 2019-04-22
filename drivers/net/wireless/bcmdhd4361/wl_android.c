@@ -3873,7 +3873,7 @@ wl_android_set_auto_channel(struct net_device *dev, const char* cmd_str,
 done:
 	if ((retry == 0) || (ret < 0)) {
 		/* On failure, fallback to a default channel */
-		if ((band == WLC_BAND_5G)) {
+		if (band == WLC_BAND_5G) {
 			channel = APCS_DEFAULT_5G_CH;
 		} else {
 			channel = APCS_DEFAULT_2G_CH;
@@ -4290,9 +4290,11 @@ int wl_android_set_ibss_beacon_ouidata(struct net_device *dev, char *command, in
 	vndr_ie_setbuf_t *vndr_ie = NULL;
 	s32 iecount;
 	uint32 pktflag;
-	u16 kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
+	gfp_t kflags;
 	s32 err = BCME_OK, bssidx;
 	struct bcm_cfg80211 *cfg = wl_get_cfg(dev);
+
+	kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
 
 	/* Check the VSIE (Vendor Specific IE) which was added.
 	 *  If exist then send IOVAR to delete it
@@ -4985,7 +4987,7 @@ int wl_android_set_ibss_routetable(struct net_device *dev, char *command, int to
 
 	ibss_route_tbl_t *route_tbl = NULL;
 	char *ioctl_buf = NULL;
-	u16 kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
+	gfp_t kflags;
 	s32 err = BCME_OK;
 	uint32 route_tbl_len;
 	uint32 entries;
@@ -4993,6 +4995,8 @@ int wl_android_set_ibss_routetable(struct net_device *dev, char *command, int to
 	uint32 i = 0;
 	struct ipv4_addr  dipaddr;
 	struct ether_addr ea;
+
+	kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
 
 	route_tbl_len = sizeof(ibss_route_tbl_t) +
 		(MAX_IBSS_ROUTE_TBL_ENTRY - 1) * sizeof(ibss_route_entry_t);
@@ -7585,7 +7589,9 @@ wl_genl_send_msg(
 	int pid = 0;
 	u8 *ptr = NULL, *p = NULL;
 	u32 tot_len = sizeof(bcm_event_hdr_t) + subhdr_len + len;
-	u16 kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
+	gfp_t kflags;
+
+	kflags = in_atomic() ? GFP_ATOMIC : GFP_KERNEL;
 
 
 	WL_DBG(("Enter \n"));
